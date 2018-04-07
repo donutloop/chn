@@ -14,6 +14,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	log "github.com/sirupsen/logrus"
 )
 
 // baseURL is the URL for the hacker news API
@@ -23,7 +24,6 @@ var baseURL = "https://hacker-news.firebaseio.com/v0/"
 var cash *cache.Cache
 
 func init() {
-
 	// cash will have default expiration time of
 	// 30 minutes and be swept every 10 minutes
 	cash = cache.New(30*time.Minute, 10*time.Minute)
@@ -39,7 +39,7 @@ type StoriesService struct{}
 func (service *StoriesService) Stories(ctx context.Context, req *handler.StoryReq) (*handler.StoryResp, error) {
 
 	// we'll get all the stories
-	var s []*handler.Story
+	 s := make([]*handler.Story, 0)
 
 	// only because of shadowing
 	var err error
@@ -60,6 +60,7 @@ func (service *StoriesService) Stories(ctx context.Context, req *handler.StoryRe
 		// get the stories from the API
 		s, err = service.getStoriesFromType(req.Category)
 		if err != nil {
+			log.WithError(err).Error("error get stories")
 			return nil, err
 		}
 
@@ -90,13 +91,13 @@ func (service *StoriesService) getStoriesFromType(pageType string) ([]*handler.S
 
 	res, err := http.Get(url)
 	if err != nil {
-		return nil, errors.New("could not get " + pageType + " hacker news posts list")
+		return nil, errors.Errorf("could not get %s hacker news posts list", pageType)
 	}
 
 	defer res.Body.Close()
 	s, err := service.getStories(res)
 	if err != nil {
-		return nil, errors.New("could not get " + pageType + " hacker news posts data")
+		return nil, errors.Errorf("could not get %s hacker news posts data", pageType)
 	}
 
 	return s, nil
@@ -112,8 +113,10 @@ func (service *StoriesService) getStories(res *http.Response) ([]*handler.Story,
 	}
 
 	// get all the story keys into a slice of ints
-	var keys []int
-	json.Unmarshal(body, &keys)
+	keys := make([]int, 0)
+	if err := json.Unmarshal(body, &keys); err != nil {
+		return nil, err
+	}
 
 	// concurrency is cool, but needs to be limited
 	semaphore := make(chan struct{}, 10)
@@ -122,7 +125,7 @@ func (service *StoriesService) getStories(res *http.Response) ([]*handler.Story,
 	wg := sync.WaitGroup{}
 
 	// somewhere to store all the stories when we're done
-	var stories []*handler.Story
+	stories := make([]*handler.Story, 0)
 
 	// go over all the stories
 	for _, key := range keys {
@@ -158,6 +161,7 @@ func (service *StoriesService) getStories(res *http.Response) ([]*handler.Story,
 			keyURL := fmt.Sprintf(baseURL+"item/%d.json", storyKey)
 			res, err := http.Get(keyURL)
 			if err != nil {
+				log.WithError(err).Error("error get stories")
 				return
 			}
 			defer res.Body.Close()
@@ -165,12 +169,14 @@ func (service *StoriesService) getStories(res *http.Response) ([]*handler.Story,
 			s := &handler.Story{}
 			unmarshaler := &jsonpb.Unmarshaler{AllowUnknownFields: true}
 			if err := unmarshaler.Unmarshal(res.Body, s); err != nil {
+				log.WithError(err).Error("error get stories")
 				return
 			}
 
 			// parse the url
 			u, err := url.Parse(s.Url)
 			if err != nil {
+				log.WithError(err).Error("error get stories")
 				return
 			}
 
