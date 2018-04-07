@@ -3,9 +3,39 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/dustin/go-humanize"
+  name = "github.com/donutloop/xservice"
+  packages = [
+    "framework/errors",
+    "framework/hooks",
+    "framework/server",
+    "framework/transport",
+    "framework/xcontext",
+    "framework/xhttp"
+  ]
+  revision = "5182803737bae1b4ecb3ed6728c9983e1a0f4554"
+
+[[projects]]
+  name = "github.com/gogo/protobuf"
+  packages = [
+    "jsonpb",
+    "proto",
+    "sortkeys",
+    "types"
+  ]
+  revision = "1adfc126b41513cc696b209667c8656ea7aac67c"
+  version = "v1.0.0"
+
+[[projects]]
+  name = "github.com/golang/protobuf"
+  packages = ["proto"]
+  revision = "925541529c1fa6821df4e44ce2723319eb2be768"
+  version = "v1.0.0"
+
+[[projects]]
+  name = "github.com/pkg/errors"
   packages = ["."]
-  revision = "bb3d318650d48840a39aa21a027c6630e198e626"
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
 
 [[projects]]
   name = "github.com/pmylund/go-cache"
@@ -13,9 +43,15 @@
   revision = "a3647f8e31d79543b2d0f0ae2fe5c379d72cedc0"
   version = "v2.1.0"
 
+[[projects]]
+  name = "github.com/urfave/cli"
+  packages = ["."]
+  revision = "cfb38830724cc34fedffe9a2a29fb54fa9169cd1"
+  version = "v1.20.0"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6a118144ea1710887aa67b56bd655b5f45c2f4531adfd749bd50649bbb242da9"
+  inputs-digest = "34b572a787ffb846f923df8ed483be95c097e18a340b30586a43f45707fcc655"
   solver-name = "gps-cdcl"
   solver-version = 1

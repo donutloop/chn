@@ -22,3 +22,5 @@
 /static/js/bundle.js
 
 /cmd/tmp/*
+
+/cmd/chn/chn

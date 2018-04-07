@@ -6,7 +6,7 @@
 //	 [chn.proto]
 //package [chn]
 
-package main
+package handler
 
 import (
 	"context"

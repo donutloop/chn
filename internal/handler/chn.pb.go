@@ -12,7 +12,7 @@ It has these top-level messages:
 	StoryResp
 	Story
 */
-package main
+package handler
 
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
