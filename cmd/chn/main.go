@@ -3,11 +3,14 @@ package main
 import (
 	"github.com/donutloop/chn/internal/service"
 	"github.com/urfave/cli"
-	"log"
 	"os"
+	log "github.com/sirupsen/logrus"
+	stdlog "log"
 )
 
 func main() {
+
+	stdlog.SetFlags(stdlog.Lshortfile| stdlog.Ldate | stdlog.Ltime)
 
 	app := cli.NewApp()
 	app.Flags = []cli.Flag{
@@ -26,11 +29,12 @@ func main() {
 			return err
 		}
 
+		log.Infof("Running on %d", port)
 		return nil
 	}
 
 	err := app.Run(os.Args)
 	if err != nil {
-		log.Fatal(err)
+		log.WithError(err).Error("could start api service")
 	}
 }

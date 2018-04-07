@@ -2,9 +2,9 @@ package service
 
 import (
 	"github.com/donutloop/chn/internal/handler"
-	"log"
 	"net/http"
 	"strconv"
+	log "github.com/sirupsen/logrus"
 )
 
 func NewAPIService(port int) *APIService {
@@ -17,7 +17,7 @@ type APIService struct {
 
 func (s *APIService) Init() error {
 
-	http.Handle("/xservice/service.chn.StoryService/Stories", handler.NewStoryServiceServer(NewStoriesService(), nil))
+	http.Handle("/xservice/service.chn.StoryService/Stories", handler.NewStoryServiceServer(NewStoriesService(), nil, log.Errorf))
 
 	// serve the favicon and logo files
 	http.HandleFunc("/favicon.ico", handler.File("favicon"))
@@ -27,7 +27,6 @@ func (s *APIService) Init() error {
 	http.HandleFunc("/", handler.File("index"))
 
 	// start the server up on our port
-	log.Printf("Running on %d\n", s.port)
 	err := http.ListenAndServe(":"+strconv.Itoa(s.port), nil)
 	if err != nil {
 		return err
