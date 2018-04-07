@@ -1,26 +1,35 @@
 <html>
   <head>
     <link rel="icon" href="favicon.ico">
-    <script src="bundle.js"></script>
+     <script src="http://unpkg.com/vue/dist/vue.js"></script>
+     <script src="http://unpkg.com/element-ui/lib/index.js"></script>
     <link rel="stylesheet" type="text/css" href="main.css">
   </head>
   </body>
-    <div id="container">
-      <div id="header">
-        <a href="/">
-          <img src="logo.gif"/>
-          <span>Code on Hacker News</span>
-        </a>
-        <ul>
-          <li><a href="/best" class="active">
-            top
-          </a></li>
-        </ul>
-      </div>
-      <div >
-          <ul id="links">
-          </ul>
-      </div>
-    </div>
+  <div id="app">
+      <el-main v-loading="loading">
+          <div id="container" >
+              <div id="header">
+                  <a href="/">
+                      <img src="logo.gif"/>
+                      <span>Code on Hacker News</span>
+                  </a>
+                  <ul>
+                      <li>
+                          <a href="/best" class="active">top</a>
+                      </li>
+                  </ul>
+              </div>
+              <div >
+                  <ul id="links">
+                      <li class="list-group-item" v-for="story in stories">
+                          <a class="title" :href="story.url">{{story.title}}</a><span class="meta">{{story.score}}</span>
+                      </li>
+                  </ul>
+              </div>
+          </div>
+      </el-main>
+  </div>
+  <script src="bundle.js"></script>
   </body>
 </html>
