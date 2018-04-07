@@ -2,23 +2,15 @@ package service
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"github.com/donutloop/chn/internal/handler"
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/pkg/errors"
 	cache "github.com/pmylund/go-cache"
-	"io/ioutil"
-	"net/http"
 	"net/url"
 	"strings"
 	"sync"
 	"time"
 	log "github.com/sirupsen/logrus"
+	"github.com/donutloop/chn/internal/client"
 )
-
-// baseURL is the URL for the hacker news API
-var baseURL = "https://hacker-news.firebaseio.com/v0/"
 
 // cash rules everything around me, get the money y'all
 var cash *cache.Cache
@@ -29,11 +21,15 @@ func init() {
 	cash = cache.New(30*time.Minute, 10*time.Minute)
 }
 
-func NewStoriesService() *StoriesService {
-	return new(StoriesService)
+func NewStoriesService(hn *client.HackerNews) *StoriesService {
+	return &StoriesService{
+		hn: hn,
+	}
 }
 
-type StoriesService struct{}
+type StoriesService struct{
+	hn *client.HackerNews
+}
 
 // pageHandler returns a handler for the correct page type
 func (service *StoriesService) Stories(ctx context.Context, req *handler.StoryReq) (*handler.StoryResp, error) {
@@ -77,46 +73,33 @@ func (service *StoriesService) Stories(ctx context.Context, req *handler.StoryRe
 
 // getStoriesFromType gets the different types of stories the API exposes
 func (service *StoriesService) getStoriesFromType(pageType string) ([]*handler.Story, error) {
-	var url string
+	var typ string
 	switch pageType {
 	case "best":
-		url = baseURL + "beststories.json"
+		typ = "beststories"
 	case "new":
-		url = baseURL + "newstories.json"
+		typ = "newstories"
 	case "show":
-		url = baseURL + "showstories.json"
+		typ = "showstories"
 	default:
-		url = baseURL + "topstories.json"
+		typ = "topstories"
 	}
 
-	res, err := http.Get(url)
+	codes, err := service.hn.GetCodesForStory(typ)
 	if err != nil {
-		return nil, errors.Errorf("could not get %s hacker news posts list", pageType)
+		return nil, err
 	}
 
-	defer res.Body.Close()
-	s, err := service.getStories(res)
+	stories, err := service.getStories(codes)
 	if err != nil {
-		return nil, errors.Errorf("could not get %s hacker news posts data", pageType)
+		return nil, err
 	}
 
-	return s, nil
+	return stories, nil
 }
 
 // getStories if you couldn't guess it, gets the stories
-func (service *StoriesService) getStories(res *http.Response) ([]*handler.Story, error) {
-
-	// this is bad! we should limit the request body size
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	// get all the story keys into a slice of ints
-	keys := make([]int, 0)
-	if err := json.Unmarshal(body, &keys); err != nil {
-		return nil, err
-	}
+func (service *StoriesService) getStories(codes []int) ([]*handler.Story, error) {
 
 	// concurrency is cool, but needs to be limited
 	semaphore := make(chan struct{}, 10)
@@ -128,7 +111,7 @@ func (service *StoriesService) getStories(res *http.Response) ([]*handler.Story,
 	stories := make([]*handler.Story, 0)
 
 	// go over all the stories
-	for _, key := range keys {
+	for _, code := range codes {
 
 		// stop when we have 30 stories
 		if len(stories) >= 30 {
@@ -139,7 +122,7 @@ func (service *StoriesService) getStories(res *http.Response) ([]*handler.Story,
 		time.Sleep(10 * time.Millisecond)
 
 		// in a goroutine with the story key
-		go func(storyKey int) {
+		go func(code int) {
 
 			// add one to the wait group
 			wg.Add(1)
@@ -157,24 +140,14 @@ func (service *StoriesService) getStories(res *http.Response) ([]*handler.Story,
 				<-semaphore
 			}()
 
-			// get the story with reckless abandon for errors
-			keyURL := fmt.Sprintf(baseURL+"item/%d.json", storyKey)
-			res, err := http.Get(keyURL)
+			p, err := service.hn.GetPost(code)
 			if err != nil {
-				log.WithError(err).Error("error get stories")
-				return
-			}
-			defer res.Body.Close()
-
-			s := &handler.Story{}
-			unmarshaler := &jsonpb.Unmarshaler{AllowUnknownFields: true}
-			if err := unmarshaler.Unmarshal(res.Body, s); err != nil {
 				log.WithError(err).Error("error get stories")
 				return
 			}
 
 			// parse the url
-			u, err := url.Parse(s.Url)
+			u, err := url.Parse(p.Url)
 			if err != nil {
 				log.WithError(err).Error("error get stories")
 				return
@@ -185,11 +158,18 @@ func (service *StoriesService) getStories(res *http.Response) ([]*handler.Story,
 
 			// check if it's from github or gitlab before adding to stories
 			if strings.Contains(h, "github") || strings.Contains(h, "gitlab") {
+
+				s := &handler.Story{
+					Score: p.Score,
+					Title: p.Title,
+					Url: p.Url,
+				}
+
 				s.DomainName = h
 				stories = append(stories, s)
 			}
 
-		}(key)
+		}(code)
 	}
 
 	// wait for all the goroutines
