@@ -205,7 +205,7 @@ func fileHandler(file string) func(w http.ResponseWriter, r *http.Request) {
 		case "index":
 			http.ServeFile(w, r, "./static/html/index.html")
 		case "bundle.js":
-			http.ServeFile(w, r, "./dist/bundle.js")
+			http.ServeFile(w, r, "./static/js/bundle.js")
 		case "main.css":
 			http.ServeFile(w, r, "./static/css/main.css")
 		default:
