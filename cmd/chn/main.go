@@ -2,15 +2,15 @@ package main
 
 import (
 	"github.com/donutloop/chn/internal/service"
-	"github.com/urfave/cli"
-	"os"
 	log "github.com/sirupsen/logrus"
+	"github.com/urfave/cli"
 	stdlog "log"
+	"os"
 )
 
 func main() {
 
-	stdlog.SetFlags(stdlog.Lshortfile| stdlog.Ldate | stdlog.Ltime)
+	stdlog.SetFlags(stdlog.Lshortfile | stdlog.Ldate | stdlog.Ltime)
 
 	app := cli.NewApp()
 	app.Flags = []cli.Flag{

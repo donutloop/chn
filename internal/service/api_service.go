@@ -1,11 +1,12 @@
 package service
 
 import (
+	"github.com/donutloop/chn/internal/cache"
+	"github.com/donutloop/chn/internal/client"
 	"github.com/donutloop/chn/internal/handler"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
-	log "github.com/sirupsen/logrus"
-	"github.com/donutloop/chn/internal/client"
 )
 
 // baseURL is the URL for the hacker news API
@@ -23,7 +24,9 @@ func (s *APIService) Init() error {
 
 	hn := client.NewHackerNews(baseURL, 10)
 
-	http.Handle("/xservice/service.chn.StoryService/Stories", handler.NewStoryServiceServer(NewStoriesService(hn), nil, log.Errorf))
+	storiesCache := cache.NewStoriesCache(30, 10)
+
+	http.Handle("/xservice/service.chn.StoryService/Stories", handler.NewStoryServiceServer(NewStoriesService(hn, storiesCache), nil, log.Errorf))
 
 	// serve the favicon and logo files
 	http.HandleFunc("/favicon.ico", handler.File("favicon"))
