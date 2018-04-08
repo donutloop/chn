@@ -61,7 +61,8 @@ proto.service.chn.StoryReq.prototype.toObject = function(opt_includeInstance) {
  */
 proto.service.chn.StoryReq.toObject = function(includeInstance, msg) {
   var f, obj = {
-    category: jspb.Message.getFieldWithDefault(msg, 1, "")
+    category: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    limit: jspb.Message.getFieldWithDefault(msg, 2, 0)
   };
 
   if (includeInstance) {
@@ -102,6 +103,10 @@ proto.service.chn.StoryReq.deserializeBinaryFromReader = function(msg, reader) {
       var value = /** @type {string} */ (reader.readString());
       msg.setCategory(value);
       break;
+    case 2:
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setLimit(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -138,6 +143,13 @@ proto.service.chn.StoryReq.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
+  f = message.getLimit();
+  if (f !== 0) {
+    writer.writeInt64(
+      2,
+      f
+    );
+  }
 };
 
 
@@ -153,6 +165,21 @@ proto.service.chn.StoryReq.prototype.getCategory = function() {
 /** @param {string} value */
 proto.service.chn.StoryReq.prototype.setCategory = function(value) {
   jspb.Message.setProto3StringField(this, 1, value);
+};
+
+
+/**
+ * optional int64 limit = 2;
+ * @return {number}
+ */
+proto.service.chn.StoryReq.prototype.getLimit = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+};
+
+
+/** @param {number} value */
+proto.service.chn.StoryReq.prototype.setLimit = function(value) {
+  jspb.Message.setProto3IntField(this, 2, value);
 };
 
 

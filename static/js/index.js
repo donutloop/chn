@@ -12,7 +12,7 @@ var app = new Vue({
     },
     created: function() {
         this.loading = true;
-        client.stories({ category:"best" }).then(stories => {
+        client.stories({ category:"best", limit: 50 }).then(stories => {
             this.stories = stories.storiesList
             this.loading = false;
         }, err => {

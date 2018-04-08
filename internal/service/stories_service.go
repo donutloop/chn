@@ -9,7 +9,6 @@ import (
 	"net/url"
 	"strings"
 	"sync"
-	"time"
 )
 
 func NewStoriesService(hn *client.HackerNews, storiesCache *cache.StoriesCache) *StoriesService {
@@ -35,7 +34,7 @@ func (service *StoriesService) Stories(ctx context.Context, req *handler.StoryRe
 	if err != nil {
 		if _, ok := err.(*cache.StoriesNotFoundError); ok {
 			// get the stories from the API
-			stories, err = service.getStoriesFromType(req.Category)
+			stories, err = service.getStoriesFromType(req.Category, req.Limit)
 			if err != nil {
 				log.WithError(err).Error("error get stories")
 				return nil, err
@@ -54,7 +53,7 @@ func (service *StoriesService) Stories(ctx context.Context, req *handler.StoryRe
 }
 
 // getStoriesFromType gets the different types of stories the API exposes
-func (service *StoriesService) getStoriesFromType(pageType string) ([]*handler.Story, error) {
+func (service *StoriesService) getStoriesFromType(pageType string, limit int64) ([]*handler.Story, error) {
 	var typ string
 	switch pageType {
 	case "best":
@@ -72,7 +71,7 @@ func (service *StoriesService) getStoriesFromType(pageType string) ([]*handler.S
 		return nil, err
 	}
 
-	stories, err := service.getStories(codes)
+	stories, err := service.getStories(codes, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +80,7 @@ func (service *StoriesService) getStoriesFromType(pageType string) ([]*handler.S
 }
 
 // getStories if you couldn't guess it, gets the stories
-func (service *StoriesService) getStories(codes []int) ([]*handler.Story, error) {
+func (service *StoriesService) getStories(codes []int, limit int64) ([]*handler.Story, error) {
 
 	// concurrency is cool, but needs to be limited
 	semaphore := make(chan struct{}, 10)
@@ -96,12 +95,9 @@ func (service *StoriesService) getStories(codes []int) ([]*handler.Story, error)
 	for _, code := range codes {
 
 		// stop when we have 30 stories
-		if len(stories) >= 30 {
+		if int64(len(stories)) >= limit {
 			break
 		}
-
-		// sleep to avoid rate limiting from API
-		time.Sleep(10 * time.Millisecond)
 
 		// in a goroutine with the story key
 		go func(code int) {
