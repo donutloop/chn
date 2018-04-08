@@ -1,0 +1,8 @@
+TimeoutAfter = 10
+
+[HackerNews]
+BaseURL = "https://hacker-news.firebaseio.com/v0/"
+
+[StoriesCache]
+DefaultExpirationInMinutes = 30
+CleanupIntervalInMinutes = 10

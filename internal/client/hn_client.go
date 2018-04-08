@@ -29,7 +29,7 @@ type Post struct {
 	Descendants int    `json:"descendants"`
 }
 
-func NewHackerNews(baseURL string, timeoutAfter int) *HackerNews {
+func NewHackerNews(baseURL string, timeoutAfter time.Duration) *HackerNews {
 	return &HackerNews{
 		baseURL:      baseURL,
 		timeoutAfter: timeoutAfter,
@@ -40,13 +40,13 @@ type HackerNews struct {
 	story   string
 	baseURL string
 	http.Client
-	timeoutAfter int
+	timeoutAfter time.Duration
 }
 
 // GetCodesStory -- Return the ids of a story
 func (c HackerNews) GetCodesForStory(story string) ([]int, error) {
 
-	req, cancel, err := newRequestWihtoutTimeout(http.MethodGet, fmt.Sprintf("%s%s.json", c.baseURL, story), nil, time.Duration(c.timeoutAfter))
+	req, cancel, err := newRequestWihtoutTimeout(http.MethodGet, fmt.Sprintf("%s%s.json", c.baseURL, story), nil, c.timeoutAfter)
 	if err != nil {
 		return nil, err
 	}
