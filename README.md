@@ -42,3 +42,9 @@ go build cmd/chn/main.go
 ```bash
  protoc -I . ./chn.proto  --js_out=import_style=commonjs,binary:./static/js --twirp_js_out=./static/js
 ```
+
+### Compile javascript bundle 
+
+```
+webpack
+```
