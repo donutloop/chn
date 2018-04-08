@@ -41,7 +41,7 @@ func (service *StoriesService) Stories(ctx context.Context, req *handler.StoryRe
 				return nil, err
 			}
 			service.storiesCache.SetStoriesBy(req.Category, stories)
-		}else{
+		} else {
 			return nil, err
 		}
 	}

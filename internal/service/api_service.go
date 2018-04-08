@@ -4,11 +4,11 @@ import (
 	"github.com/donutloop/chn/internal/cache"
 	"github.com/donutloop/chn/internal/client"
 	"github.com/donutloop/chn/internal/handler"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
 	"time"
 )
 
@@ -35,17 +35,13 @@ func (s *APIService) Init() error {
 
 	r.Use(
 		middleware.DefaultLogger,
-		middleware.Timeout(15*time.Second ),
+		middleware.Timeout(15*time.Second),
 		middleware.Recoverer,
 	)
 
 	// routes ...
-	r.Method(http.MethodPost,"/xservice/service.chn.StoryService/Stories", handler.NewStoryServiceServer(NewStoriesService(hn, storiesCache), nil, log.Errorf))
-
-	r.Get("/favicon.ico", handler.File("favicon"))
-	r.Get("/logo.gif", handler.File("logo"))
-	r.Get("/bundle.js", handler.File("bundle.js"))
-	r.Get("/main.css", handler.File("main.css"))
+	r.Method(http.MethodPost, "/xservice/service.chn.StoryService/Stories", handler.NewStoryServiceServer(NewStoriesService(hn, storiesCache), nil, log.Errorf))
+	handler.FileServer(r, "/static", http.Dir("../../static"))
 	r.Get("/", handler.File("index"))
 
 	// start the server up on our port
