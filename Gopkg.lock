@@ -15,6 +15,12 @@
   revision = "5182803737bae1b4ecb3ed6728c9983e1a0f4554"
 
 [[projects]]
+  name = "github.com/go-chi/chi"
+  packages = ["."]
+  revision = "e83ac2304db3c50cf03d96a2fcd39009d458bc35"
+  version = "v3.3.2"
+
+[[projects]]
   name = "github.com/gogo/protobuf"
   packages = [
     "jsonpb",
@@ -27,11 +33,7 @@
 
 [[projects]]
   name = "github.com/golang/protobuf"
-  packages = [
-    "jsonpb",
-    "proto",
-    "ptypes/struct"
-  ]
+  packages = ["proto"]
   revision = "925541529c1fa6821df4e44ce2723319eb2be768"
   version = "v1.0.0"
 
@@ -77,6 +79,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a8aeac7298126e83ff112a073fe774ecdff4bda48fa9a0233cb035ac992e2b8e"
+  inputs-digest = "d2af8f17787e2b5d73ec4f8526d6e5e5aef27eac9e2513ff22cc28b78f3a8693"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -7,6 +7,9 @@ import (
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
+	"time"
 )
 
 // baseURL is the URL for the hacker news API
@@ -22,21 +25,31 @@ type APIService struct {
 
 func (s *APIService) Init() error {
 
+	// components ...
 	hn := client.NewHackerNews(baseURL, 10)
 
 	storiesCache := cache.NewStoriesCache(30, 10)
 
-	http.Handle("/xservice/service.chn.StoryService/Stories", handler.NewStoryServiceServer(NewStoriesService(hn, storiesCache), nil, log.Errorf))
+	// router and middleware ...
+	r := chi.NewRouter()
 
-	// serve the favicon and logo files
-	http.HandleFunc("/favicon.ico", handler.File("favicon"))
-	http.HandleFunc("/logo.gif", handler.File("logo"))
-	http.HandleFunc("/bundle.js", handler.File("bundle.js"))
-	http.HandleFunc("/main.css", handler.File("main.css"))
-	http.HandleFunc("/", handler.File("index"))
+	r.Use(
+		middleware.DefaultLogger,
+		middleware.Timeout(15*time.Second ),
+		middleware.Recoverer,
+	)
+
+	// routes ...
+	r.Method(http.MethodPost,"/xservice/service.chn.StoryService/Stories", handler.NewStoryServiceServer(NewStoriesService(hn, storiesCache), nil, log.Errorf))
+
+	r.Get("/favicon.ico", handler.File("favicon"))
+	r.Get("/logo.gif", handler.File("logo"))
+	r.Get("/bundle.js", handler.File("bundle.js"))
+	r.Get("/main.css", handler.File("main.css"))
+	r.Get("/", handler.File("index"))
 
 	// start the server up on our port
-	err := http.ListenAndServe(":"+strconv.Itoa(s.port), nil)
+	err := http.ListenAndServe(":"+strconv.Itoa(s.port), r)
 	if err != nil {
 		return err
 	}
