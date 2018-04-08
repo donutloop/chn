@@ -1,6 +1,8 @@
 package main
 
 import (
+	"github.com/BurntSushi/toml"
+	"github.com/donutloop/chn/internal/api"
 	"github.com/donutloop/chn/internal/service"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
@@ -14,18 +16,30 @@ func main() {
 
 	app := cli.NewApp()
 	app.Flags = []cli.Flag{
-		cli.StringFlag{
+		cli.IntFlag{
 			Name:  "port",
-			Value: "8080",
+			Value: 8080,
+			Usage: "server is listing on port",
+		},
+		cli.StringFlag{
+			Name:  "config",
+			Value: "../../cfg/config_local.toml",
 			Usage: "server is listing on port",
 		},
 	}
 
 	app.Action = func(c *cli.Context) error {
 		port := c.GlobalInt("port")
-		api := service.NewAPIService(port)
 
-		if err := api.Init(); err != nil {
+		config := &api.Config{}
+		_, err := toml.DecodeFile(c.GlobalString("config"), config)
+		if err != nil {
+			return err
+		}
+
+		apiService := service.NewAPIService(port, config)
+
+		if err := apiService.Init(); err != nil {
 			return err
 		}
 
