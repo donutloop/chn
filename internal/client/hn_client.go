@@ -1,13 +1,13 @@
 package client
 
 import (
-	"fmt"
-	"encoding/json"
-	"net/http"
 	"context"
+	"encoding/json"
+	"fmt"
 	"io"
-	"time"
+	"net/http"
 	"strconv"
+	"time"
 )
 
 // Post -- represents the json object returned by the API
@@ -23,7 +23,7 @@ type Post struct {
 	Poll        int    `json:"poll"`
 	Kids        []int  `json:"kids"`
 	Url         string `json:"url"`
-	Score       int64    `json:"score"`
+	Score       int64  `json:"score"`
 	Title       string `json:"title"`
 	Parts       []int  `json:"parts"`
 	Descendants int    `json:"descendants"`
@@ -31,7 +31,7 @@ type Post struct {
 
 func NewHackerNews(baseURL string, timeoutAfter int) *HackerNews {
 	return &HackerNews{
-		baseURL:baseURL,
+		baseURL:      baseURL,
 		timeoutAfter: timeoutAfter,
 	}
 }
@@ -67,7 +67,7 @@ func (c HackerNews) GetCodesForStory(story string) ([]int, error) {
 
 // GetPostStory -- Return the posts of story thanks their ids
 func (c HackerNews) GetPost(code int) (*Post, error) {
-	req, cancel, err := newRequestWihtoutTimeout(http.MethodGet, fmt.Sprintf("%s/item/%s.json", c.baseURL,  strconv.Itoa(code)), nil, time.Duration(c.timeoutAfter))
+	req, cancel, err := newRequestWihtoutTimeout(http.MethodGet, fmt.Sprintf("%s/item/%s.json", c.baseURL, strconv.Itoa(code)), nil, time.Duration(c.timeoutAfter))
 	if err != nil {
 		return nil, err
 	}
@@ -95,6 +95,3 @@ func newRequestWihtoutTimeout(method string, url string, body io.Reader, timeout
 	req = req.WithContext(ctx)
 	return req, cancel, err
 }
-
-
-

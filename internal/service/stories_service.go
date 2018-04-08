@@ -2,70 +2,52 @@ package service
 
 import (
 	"context"
+	"github.com/donutloop/chn/internal/cache"
+	"github.com/donutloop/chn/internal/client"
 	"github.com/donutloop/chn/internal/handler"
-	cache "github.com/pmylund/go-cache"
+	log "github.com/sirupsen/logrus"
 	"net/url"
 	"strings"
 	"sync"
 	"time"
-	log "github.com/sirupsen/logrus"
-	"github.com/donutloop/chn/internal/client"
 )
 
-// cash rules everything around me, get the money y'all
-var cash *cache.Cache
-
-func init() {
-	// cash will have default expiration time of
-	// 30 minutes and be swept every 10 minutes
-	cash = cache.New(30*time.Minute, 10*time.Minute)
-}
-
-func NewStoriesService(hn *client.HackerNews) *StoriesService {
+func NewStoriesService(hn *client.HackerNews, storiesCache *cache.StoriesCache) *StoriesService {
 	return &StoriesService{
-		hn: hn,
+		hn:           hn,
+		storiesCache: storiesCache,
 	}
 }
 
-type StoriesService struct{
-	hn *client.HackerNews
+type StoriesService struct {
+	hn           *client.HackerNews
+	storiesCache *cache.StoriesCache
 }
 
 // pageHandler returns a handler for the correct page type
 func (service *StoriesService) Stories(ctx context.Context, req *handler.StoryReq) (*handler.StoryResp, error) {
 
 	// we'll get all the stories
-	 s := make([]*handler.Story, 0)
-
-	// only because of shadowing
+	stories := make([]*handler.Story, 0)
 	var err error
 
-	// know if we should use the cache
-	var ok bool
-
-	// check if we hit the cached stories for this page type
-	value, found := cash.Get(req.Category)
-	if found {
-		// check if valid stories
-		s, ok = value.([]*handler.Story)
-	}
-
-	// if it's not or we didn't hit the cached stories
-	if !ok {
-
-		// get the stories from the API
-		s, err = service.getStoriesFromType(req.Category)
-		if err != nil {
-			log.WithError(err).Error("error get stories")
+	stories, err = service.storiesCache.GetStoriesBy(req.Category)
+	if err != nil {
+		if _, ok := err.(*cache.StoriesNotFoundError); ok {
+			// get the stories from the API
+			stories, err = service.getStoriesFromType(req.Category)
+			if err != nil {
+				log.WithError(err).Error("error get stories")
+				return nil, err
+			}
+			service.storiesCache.SetStoriesBy(req.Category, stories)
+		}else{
 			return nil, err
 		}
-
-		// set the cached stories for this page type
-		cash.Set(req.Category, s, cache.DefaultExpiration)
 	}
 
 	resp := &handler.StoryResp{
-		Stories: s,
+		Stories: stories,
 	}
 
 	return resp, nil
@@ -162,7 +144,7 @@ func (service *StoriesService) getStories(codes []int) ([]*handler.Story, error)
 				s := &handler.Story{
 					Score: p.Score,
 					Title: p.Title,
-					Url: p.Url,
+					Url:   p.Url,
 				}
 
 				s.DomainName = h
