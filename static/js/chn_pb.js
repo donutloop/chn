@@ -374,7 +374,7 @@ if (goog.DEBUG && !COMPILED) {
  * @private {!Array<number>}
  * @const
  */
-proto.service.chn.Story.repeatedFields_ = [4];
+proto.service.chn.Story.repeatedFields_ = [4,10];
 
 
 
@@ -413,7 +413,8 @@ proto.service.chn.Story.toObject = function(includeInstance, msg) {
     type: jspb.Message.getFieldWithDefault(msg, 6, ""),
     title: jspb.Message.getFieldWithDefault(msg, 7, ""),
     url: jspb.Message.getFieldWithDefault(msg, 8, ""),
-    domainname: jspb.Message.getFieldWithDefault(msg, 9, "")
+    domainname: jspb.Message.getFieldWithDefault(msg, 9, ""),
+    langaugesList: jspb.Message.getRepeatedField(msg, 10)
   };
 
   if (includeInstance) {
@@ -485,6 +486,10 @@ proto.service.chn.Story.deserializeBinaryFromReader = function(msg, reader) {
     case 9:
       var value = /** @type {string} */ (reader.readString());
       msg.setDomainname(value);
+      break;
+    case 10:
+      var value = /** @type {string} */ (reader.readString());
+      msg.addLangauges(value);
       break;
     default:
       reader.skipField();
@@ -575,6 +580,13 @@ proto.service.chn.Story.serializeBinaryToWriter = function(message, writer) {
   if (f.length > 0) {
     writer.writeString(
       9,
+      f
+    );
+  }
+  f = message.getLangaugesList();
+  if (f.length > 0) {
+    writer.writeRepeatedString(
+      10,
       f
     );
   }
@@ -727,6 +739,35 @@ proto.service.chn.Story.prototype.getDomainname = function() {
 /** @param {string} value */
 proto.service.chn.Story.prototype.setDomainname = function(value) {
   jspb.Message.setProto3StringField(this, 9, value);
+};
+
+
+/**
+ * repeated string Langauges = 10;
+ * @return {!Array.<string>}
+ */
+proto.service.chn.Story.prototype.getLangaugesList = function() {
+  return /** @type {!Array.<string>} */ (jspb.Message.getRepeatedField(this, 10));
+};
+
+
+/** @param {!Array.<string>} value */
+proto.service.chn.Story.prototype.setLangaugesList = function(value) {
+  jspb.Message.setField(this, 10, value || []);
+};
+
+
+/**
+ * @param {!string} value
+ * @param {number=} opt_index
+ */
+proto.service.chn.Story.prototype.addLangauges = function(value, opt_index) {
+  jspb.Message.addToRepeatedField(this, 10, value, opt_index);
+};
+
+
+proto.service.chn.Story.prototype.clearLangaugesList = function() {
+  this.setLangaugesList([]);
 };
 
 

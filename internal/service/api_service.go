@@ -29,6 +29,7 @@ func (s *APIService) Init() error {
 
 	// components ...
 	hn := client.NewHackerNews(s.config.HackerNews.BaseURL, s.config.TimeoutAfter)
+	github := client.NewGithub(s.config.Github.BaseURL, s.config.TimeoutAfter)
 
 	storiesCache := cache.NewStoriesCache(s.config.StoriesCache.DefaultExpirationInMinutes, s.config.StoriesCache.CleanupIntervalInMinutes)
 
@@ -41,8 +42,11 @@ func (s *APIService) Init() error {
 		middleware.Recoverer,
 	)
 
+	// services ...
+	storiesService := NewStoriesService(hn, storiesCache, github)
+
 	// routes ...
-	r.Method(http.MethodPost, "/xservice/service.chn.StoryService/Stories", handler.NewStoryServiceServer(NewStoriesService(hn, storiesCache), nil, log.Errorf))
+	r.Method(http.MethodPost, "/xservice/service.chn.StoryService/Stories", handler.NewStoryServiceServer(storiesService, nil, log.Errorf))
 	handler.FileServer(r, "/static", http.Dir("../../static"))
 	r.Get("/", handler.File("index"))
 
