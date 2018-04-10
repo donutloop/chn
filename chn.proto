@@ -26,4 +26,5 @@ message Story {
     string title = 7;
     string url = 8;
     string domainName = 9;
+    repeated string Langauges = 10;
 }

@@ -37,9 +37,10 @@ func main() {
 			return err
 		}
 
-		apiService := service.NewAPIService(port, config)
+		apiService := service.NewAPIService(config)
+		apiService.Init()
 
-		if err := apiService.Init(); err != nil {
+		if err := apiService.Start(port); err != nil {
 			return err
 		}
 
@@ -47,8 +48,7 @@ func main() {
 		return nil
 	}
 
-	err := app.Run(os.Args)
-	if err != nil {
+	if err := app.Run(os.Args); err != nil {
 		log.WithError(err).Error("could start api service")
 	}
 }
