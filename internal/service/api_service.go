@@ -13,19 +13,18 @@ import (
 	"time"
 )
 
-func NewAPIService(port int, config *api.Config) *APIService {
+func NewAPIService(config *api.Config) *APIService {
 	return &APIService{
-		port:   port,
 		config: config,
 	}
 }
 
 type APIService struct {
-	port   int
 	config *api.Config
+	Router *chi.Mux
 }
 
-func (s *APIService) Init() error {
+func (s *APIService) Init()  {
 
 	// components ...
 	hn := client.NewHackerNews(s.config.HackerNews.BaseURL, s.config.TimeoutAfter)
@@ -50,11 +49,11 @@ func (s *APIService) Init() error {
 	handler.FileServer(r, "/static", http.Dir("../../static"))
 	r.Get("/", handler.File("index"))
 
-	// start the server up on our port
-	err := http.ListenAndServe(":"+strconv.Itoa(s.port), r)
-	if err != nil {
-		return err
-	}
+	s.Router = r
+	return
+}
 
-	return nil
+func (s *APIService) Start(port int) error {
+	// start the server up on our port
+	return http.ListenAndServe(":"+strconv.Itoa(port), s.Router)
 }
