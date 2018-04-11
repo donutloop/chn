@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"github.com/donutloop/chn/internal/mediator"
+	"github.com/donutloop/chn/internal/scraper"
 )
 
 func NewAPIService(config *api.Config) *APIService {
@@ -24,11 +26,14 @@ type APIService struct {
 	Router *chi.Mux
 }
 
-func (s *APIService) Init()  {
+func (s *APIService) Init() {
 
 	// components ...
 	hn := client.NewHackerNews(s.config.HackerNews.BaseURL, s.config.TimeoutAfter)
-	github := client.NewGithub(s.config.Github.BaseURL, s.config.TimeoutAfter)
+	githubClient := client.NewGithub(s.config.Github.BaseURL, s.config.TimeoutAfter)
+	githubScraper := scraper.NewGithubScraper()
+
+	githubMediator := mediator.NewGithub(githubClient, githubScraper, s.config.Github.BaseURL, s.config.TimeoutAfter)
 
 	storiesCache := cache.NewStoriesCache(s.config.StoriesCache.DefaultExpirationInMinutes, s.config.StoriesCache.CleanupIntervalInMinutes)
 
@@ -42,7 +47,7 @@ func (s *APIService) Init()  {
 	)
 
 	// services ...
-	storiesService := NewStoriesService(hn, storiesCache, github)
+	storiesService := NewStoriesService(hn, storiesCache, githubMediator)
 
 	// routes ...
 	r.Method(http.MethodPost, "/xservice/service.chn.StoryService/Stories", handler.NewStoryServiceServer(storiesService, nil, log.Errorf))

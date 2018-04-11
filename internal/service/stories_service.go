@@ -7,12 +7,12 @@ import (
 	"github.com/donutloop/chn/internal/handler"
 	log "github.com/sirupsen/logrus"
 	"net/url"
-	"sort"
 	"strings"
 	"sync"
+	"github.com/donutloop/chn/internal/mediator"
 )
 
-func NewStoriesService(hn *client.HackerNews, storiesCache *cache.StoriesCache, github *client.Github) *StoriesService {
+func NewStoriesService(hn *client.HackerNews, storiesCache *cache.StoriesCache, github *mediator.Github) *StoriesService {
 	return &StoriesService{
 		hn:           hn,
 		storiesCache: storiesCache,
@@ -22,7 +22,7 @@ func NewStoriesService(hn *client.HackerNews, storiesCache *cache.StoriesCache, 
 
 type StoriesService struct {
 	hn           *client.HackerNews
-	gh           *client.Github
+	gh           *mediator.Github
 	storiesCache *cache.StoriesCache
 }
 
@@ -147,24 +147,10 @@ func (service *StoriesService) getStories(codes []int, limit int64) ([]*handler.
 				}
 
 				if strings.Contains(h, "github") {
-
-					pathParts := strings.Split(strings.TrimLeft(u.Path, "/"), "/")
-					if len(pathParts) == 2 {
-						languages, err := service.gh.ListsLanguages(pathParts[0], pathParts[1])
-						if err != nil {
-							log.WithError(err).Error("error get stories")
-						} else {
-							ls := make([]string, 0)
-							for l := range languages {
-								ls = append(ls, l)
-							}
-
-							sort.Strings(ls)
-
-							s.Langauges = ls
-						}
-					} else {
-						log.Errorf("error get stories splitting github url has failed (len: %d)", len(pathParts))
+					var err error
+					s.Langauges, err = service.gh.GetDataBy(p.Url)
+					if err != nil {
+						log.WithError(err).Error("error get stories")
 					}
 				}
 
