@@ -1,17 +1,17 @@
 package chn_integration
 
 import (
-	"testing"
-	"net/http/httptest"
-	"os"
-	"github.com/donutloop/chn/internal/service"
+	"context"
+	"fmt"
 	"github.com/BurntSushi/toml"
 	"github.com/donutloop/chn/internal/api"
-	"log"
-	"fmt"
 	"github.com/donutloop/chn/internal/handler"
+	"github.com/donutloop/chn/internal/service"
+	"log"
 	"net/http"
-	"context"
+	"net/http/httptest"
+	"os"
+	"testing"
 )
 
 var url string
@@ -39,7 +39,7 @@ func TestStoriesJSONCall(t *testing.T) {
 
 	client := handler.NewStoryServiceJSONClient(url, new(http.Client))
 
-	storyResp, err := client.Stories(context.Background(), &handler.StoryReq{Category: "best", Limit:10})
+	storyResp, err := client.Stories(context.Background(), &handler.StoryReq{Category: "best", Limit: 10})
 	if err != nil {
 		t.Fatal(err)
 	}
