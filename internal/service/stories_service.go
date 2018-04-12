@@ -10,13 +10,15 @@ import (
 	"strings"
 	"sync"
 	"github.com/donutloop/chn/internal/mediator"
+	"github.com/donutloop/chn/internal/storage"
 )
 
-func NewStoriesService(hn *client.HackerNews, storiesCache *cache.StoriesCache, github *mediator.Github) *StoriesService {
+func NewStoriesService(hn *client.HackerNews, storiesCache *cache.StoriesCache, github *mediator.Github, st storage.Interface) *StoriesService {
 	return &StoriesService{
 		hn:           hn,
 		storiesCache: storiesCache,
 		gh:           github,
+		st: st,
 	}
 }
 
@@ -24,6 +26,7 @@ type StoriesService struct {
 	hn           *client.HackerNews
 	gh           *mediator.Github
 	storiesCache *cache.StoriesCache
+	st           storage.Interface
 }
 
 // pageHandler returns a handler for the correct page type

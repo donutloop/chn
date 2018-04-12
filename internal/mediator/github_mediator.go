@@ -38,7 +38,7 @@ func (c Github) GetDataBy(url string) ([]string, error) {
 
 	u, err := url2.Parse(baseUrl)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error get stories")
+		return nil, err
 	}
 
 	pathParts := strings.Split(strings.TrimLeft(u.Path, "/"), "/")
@@ -56,5 +56,5 @@ func (c Github) GetDataBy(url string) ([]string, error) {
 			return languages, nil
 		}
 	}
-	return nil, errors.Errorf("error get stories splitting github url has failed (len: %d)", len(pathParts))
+	return nil, errors.Errorf("error splitting github url has failed (len: %d)", len(pathParts))
 }
