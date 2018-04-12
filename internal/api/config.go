@@ -7,6 +7,7 @@ type Config struct {
 	HackerNews   HackerNewsConfig   `toml:"HackerNews"`
 	StoriesCache StoriesCacheConfig `toml:"StoriesCache"`
 	Github       GithubConfig       `toml:"Github"`
+	Storage      StorageConfig      `toml:"Storage"`
 }
 
 type HackerNewsConfig struct {
@@ -20,4 +21,13 @@ type StoriesCacheConfig struct {
 
 type GithubConfig struct {
 	BaseURL string
+}
+
+type StorageConfig struct {
+	TimeoutAfter time.Duration
+	Username string
+	Password string
+	Database string
+	Handler  string
+	Address  string
 }

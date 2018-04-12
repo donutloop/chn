@@ -24,3 +24,5 @@
 /cmd/tmp/*
 
 /cmd/chn/chn
+
+/data

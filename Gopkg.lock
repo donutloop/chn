@@ -33,6 +33,18 @@
   revision = "5182803737bae1b4ecb3ed6728c9983e1a0f4554"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/globalsign/mgo"
+  packages = [
+    ".",
+    "bson",
+    "internal/json",
+    "internal/sasl",
+    "internal/scram"
+  ]
+  revision = "f76e4f9da92ecd56e3be26f5ba92580af1ef97b4"
+
+[[projects]]
   name = "github.com/go-chi/chi"
   packages = [
     ".",
@@ -69,6 +81,12 @@
   packages = ["."]
   revision = "a3647f8e31d79543b2d0f0ae2fe5c379d72cedc0"
   version = "v2.1.0"
+
+[[projects]]
+  name = "github.com/satori/go.uuid"
+  packages = ["."]
+  revision = "f58768cc1a7a7e77a3bd49e98cdd21419399b6a3"
+  version = "v1.2.0"
 
 [[projects]]
   name = "github.com/sirupsen/logrus"
@@ -109,6 +127,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c2ba8f3637c8edebef0e5e17ffb3a297160457644c4f7ca541bf09ec212e09c6"
+  inputs-digest = "9bf204f077ef77bb7fd7543eb230c4a1d2bc9654d5259dd7ffcbd0b24779f9fd"
   solver-name = "gps-cdcl"
   solver-version = 1

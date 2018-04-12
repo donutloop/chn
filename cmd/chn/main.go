@@ -38,7 +38,10 @@ func main() {
 		}
 
 		apiService := service.NewAPIService(config)
-		apiService.Init()
+
+		if err := apiService.Init(); err != nil {
+			return err
+		}
 
 		if err := apiService.Start(port); err != nil {
 			return err

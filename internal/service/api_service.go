@@ -13,6 +13,7 @@ import (
 	"time"
 	"github.com/donutloop/chn/internal/mediator"
 	"github.com/donutloop/chn/internal/scraper"
+	"github.com/donutloop/chn/internal/storage"
 )
 
 func NewAPIService(config *api.Config) *APIService {
@@ -26,7 +27,7 @@ type APIService struct {
 	Router *chi.Mux
 }
 
-func (s *APIService) Init() {
+func (s *APIService) Init() error {
 
 	// components ...
 	hn := client.NewHackerNews(s.config.HackerNews.BaseURL, s.config.TimeoutAfter)
@@ -36,6 +37,13 @@ func (s *APIService) Init() {
 	githubMediator := mediator.NewGithub(githubClient, githubScraper, s.config.Github.BaseURL, s.config.TimeoutAfter)
 
 	storiesCache := cache.NewStoriesCache(s.config.StoriesCache.DefaultExpirationInMinutes, s.config.StoriesCache.CleanupIntervalInMinutes)
+
+	st, err := storage.New(s.config)
+	if err != nil {
+		return err
+	} else {
+		log.Infof("storage is connected (%s)", s.config.Storage.Address)
+	}
 
 	// router and middleware ...
 	r := chi.NewRouter()
@@ -47,7 +55,7 @@ func (s *APIService) Init() {
 	)
 
 	// services ...
-	storiesService := NewStoriesService(hn, storiesCache, githubMediator)
+	storiesService := NewStoriesService(hn, storiesCache, githubMediator, st)
 
 	// routes ...
 	r.Method(http.MethodPost, "/xservice/service.chn.StoryService/Stories", handler.NewStoryServiceServer(storiesService, nil, log.Errorf))
@@ -55,7 +63,7 @@ func (s *APIService) Init() {
 	r.Get("/", handler.File("index"))
 
 	s.Router = r
-	return
+	return nil
 }
 
 func (s *APIService) Start(port int) error {
