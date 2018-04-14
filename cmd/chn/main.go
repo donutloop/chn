@@ -26,12 +26,18 @@ func main() {
 			Value: "../../cfg/config_local.toml",
 			Usage: "server is listing on port",
 		},
+		cli.StringFlag{
+			Name:  "env",
+			Value: "DEV",
+		},
 	}
 
 	app.Action = func(c *cli.Context) error {
 		port := c.GlobalInt("port")
 
-		config := &api.Config{}
+		config := &api.Config{
+			ENV: c.GlobalString("env"),
+		}
 		_, err := toml.DecodeFile(c.GlobalString("config"), config)
 		if err != nil {
 			return err

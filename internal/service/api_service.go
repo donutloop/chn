@@ -29,6 +29,8 @@ type APIService struct {
 
 func (s *APIService) Init() error {
 
+	setupLogger(s.config.ENV)
+
 	// components ...
 	hn := client.NewHackerNews(s.config.HackerNews.BaseURL, s.config.TimeoutAfter)
 	githubClient := client.NewGithub(s.config.Github.BaseURL, s.config.TimeoutAfter)
@@ -69,4 +71,14 @@ func (s *APIService) Init() error {
 func (s *APIService) Start(port int) error {
 	// start the server up on our port
 	return http.ListenAndServe(":"+strconv.Itoa(port), s.Router)
+}
+
+func setupLogger(env string) {
+	switch env {
+	case "DEV":
+		log.SetLevel(log.DebugLevel)
+		log.SetFormatter(&log.TextFormatter{})
+	default:
+		log.SetFormatter(&log.JSONFormatter{})
+	}
 }
