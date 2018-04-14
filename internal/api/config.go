@@ -3,6 +3,7 @@ package api
 import "time"
 
 type Config struct {
+	ENV 		 string
 	TimeoutAfter time.Duration
 	HackerNews   HackerNewsConfig   `toml:"HackerNews"`
 	StoriesCache StoriesCacheConfig `toml:"StoriesCache"`

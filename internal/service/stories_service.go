@@ -144,6 +144,7 @@ func (service *StoriesService) getStories(codes []int, limit int64) ([]*handler.
 
 			// check if it's from github or gitlab before adding to stories
 			if strings.Contains(h, "github") || strings.Contains(h, "gitlab") {
+				log.Debugf("found url (%s)", p.Url)
 
 				s := &handler.Story{
 					Score: p.Score,
