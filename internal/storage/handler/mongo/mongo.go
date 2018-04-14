@@ -40,6 +40,7 @@ func (h *handler) Prepare() error {
 	if err != nil {
 		return err
 	}
+
 	// Switch the session to a monotonic behavior.
 	mgoSession.SetMode(mgo.Monotonic, true)
 	defer mgoSession.Close()
@@ -121,6 +122,21 @@ func (h *handler) One(obj object.Interface) error {
 
 	return nil
 
+}
+
+func (h *handler) FindBy(name string, value interface{}, obj object.Interface) error {
+
+	s := h.client.New()
+
+	defer s.Close()
+
+	if err := s.DB(h.database).C(obj.GetNamespace()).Find(bson.M{name: value}).One(obj); err == mgo.ErrNotFound {
+		return mgo.ErrNotFound
+	} else if err != nil {
+		return fmt.Errorf( "`%s::%s::%s`", obj.GetNamespace(), obj.GetId(), err.Error())
+	}
+
+	return nil
 }
 
 // Insert
