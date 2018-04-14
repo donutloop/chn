@@ -25,6 +25,7 @@ type (
 		Insert(doc object.Interface) error
 		Update(doc object.Interface) error
 		Remove(doc object.Interface) error
+		FindBy(name string, value interface{}, obj object.Interface) error
 	}
 )
 

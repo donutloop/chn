@@ -11,6 +11,8 @@ import (
 	"sync"
 	"github.com/donutloop/chn/internal/mediator"
 	"github.com/donutloop/chn/internal/storage"
+	"github.com/donutloop/chn/internal/model"
+	"github.com/globalsign/mgo"
 )
 
 func NewStoriesService(hn *client.HackerNews, storiesCache *cache.StoriesCache, github *mediator.Github, st storage.Interface) *StoriesService {
@@ -159,6 +161,16 @@ func (service *StoriesService) getStories(codes []int, limit int64) ([]*handler.
 
 				s.DomainName = h
 				stories = append(stories, s)
+
+				if err := service.st.FindBy("url", s.Url,  new(model.Story)); err == mgo.ErrNotFound {
+					log.Debugf("insert new entity into storage (%s)", s.Url)
+					ms := model.NewStoryFrom(s)
+					if err := service.st.Insert(ms); err != nil {
+						log.WithError(err).Error("error get stories")
+					}
+				} else if err != nil {
+					log.WithError(err).Error("error get stories")
+				}
 			}
 
 		}(code)
