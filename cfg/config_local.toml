@@ -17,3 +17,8 @@ Password = ""
 Address = "localhost:27017"
 Database = "chn"
 Handler  = "mongodb"
+
+[StoriesStorage]
+InitialInterval = 1.0
+MaxInterval = 3.0
+Tries = 3

@@ -11,16 +11,15 @@ import (
 	"sync"
 	"github.com/donutloop/chn/internal/mediator"
 	"github.com/donutloop/chn/internal/storage"
-	"github.com/donutloop/chn/internal/model"
-	"github.com/globalsign/mgo"
+	"github.com/donutloop/toolkit/multierror"
 )
 
-func NewStoriesService(hn *client.HackerNews, storiesCache *cache.StoriesCache, github *mediator.Github, st storage.Interface) *StoriesService {
+func NewStoriesService(hn *client.HackerNews, storiesCache *cache.StoriesCache, github *mediator.Github, st *storage.Stories) *StoriesService {
 	return &StoriesService{
 		hn:           hn,
 		storiesCache: storiesCache,
 		gh:           github,
-		st: st,
+		storiesStorage: st,
 	}
 }
 
@@ -28,7 +27,7 @@ type StoriesService struct {
 	hn           *client.HackerNews
 	gh           *mediator.Github
 	storiesCache *cache.StoriesCache
-	st           storage.Interface
+	storiesStorage           *storage.Stories
 }
 
 // pageHandler returns a handler for the correct page type
@@ -47,7 +46,13 @@ func (service *StoriesService) Stories(ctx context.Context, req *handler.StoryRe
 				log.WithError(err).Error("error get stories")
 				return nil, err
 			}
-			service.storiesCache.SetStoriesBy(req.Category, stories)
+			go func(category string, stroies []*handler.Story) {
+				service.storiesCache.SetStoriesBy(category, stories)
+				if errs := service.storiesStorage.SaveNewStoriesWithRetry(stories); len(errs) != 0 {
+					err := multierror.New(errs...)
+					log.WithError(err).Error("get stories")
+				}
+			}(req.Category, stories)
 		} else {
 			return nil, err
 		}
@@ -162,16 +167,6 @@ func (service *StoriesService) getStories(codes []int, limit int64) ([]*handler.
 
 				s.DomainName = h
 				stories = append(stories, s)
-
-				if err := service.st.FindBy("url", s.Url,  new(model.Story)); err == mgo.ErrNotFound {
-					log.Debugf("insert new entity into storage (%s)", s.Url)
-					ms := model.NewStoryFrom(s)
-					if err := service.st.Insert(ms); err != nil {
-						log.WithError(err).Error("error get stories")
-					}
-				} else if err != nil {
-					log.WithError(err).Error("error get stories")
-				}
 			}
 
 		}(code)

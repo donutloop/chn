@@ -9,6 +9,7 @@ type Config struct {
 	StoriesCache StoriesCacheConfig `toml:"StoriesCache"`
 	Github       GithubConfig       `toml:"Github"`
 	Storage      StorageConfig      `toml:"Storage"`
+	StoriesStorage StoriesStorageConfig `toml:"StoriesStorage"`
 }
 
 type HackerNewsConfig struct {
@@ -31,4 +32,10 @@ type StorageConfig struct {
 	Database string
 	Handler  string
 	Address  string
+}
+
+type StoriesStorageConfig struct {
+	InitialInterval float64
+	MaxInterval  float64
+	Tries  			uint
 }
