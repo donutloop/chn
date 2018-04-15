@@ -40,12 +40,15 @@ func (s *APIService) Init() error {
 
 	storiesCache := cache.NewStoriesCache(s.config.StoriesCache.DefaultExpirationInMinutes, s.config.StoriesCache.CleanupIntervalInMinutes)
 
+
 	st, err := storage.New(s.config)
 	if err != nil {
 		return err
 	} else {
 		log.Infof("storage is connected (%s)", s.config.Storage.Address)
 	}
+
+	storiesStorage := storage.NewStories(st, s.config.StoriesStorage.Tries, s.config.StoriesStorage.InitialInterval, s.config.StoriesStorage.MaxInterval)
 
 	// router and middleware ...
 	r := chi.NewRouter()
@@ -57,7 +60,7 @@ func (s *APIService) Init() error {
 	)
 
 	// services ...
-	storiesService := NewStoriesService(hn, storiesCache, githubMediator, st)
+	storiesService := NewStoriesService(hn, storiesCache, githubMediator, storiesStorage)
 
 	// routes ...
 	r.Method(http.MethodPost, "/xservice/service.chn.StoryService/Stories", handler.NewStoryServiceServer(storiesService, nil, log.Errorf))

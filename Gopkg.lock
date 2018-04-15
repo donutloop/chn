@@ -20,6 +20,12 @@
   version = "v1.0.0"
 
 [[projects]]
+  name = "github.com/donutloop/toolkit"
+  packages = ["retry"]
+  revision = "da402e8bb5494496df89d22d4bf6608b720a79b3"
+  version = "1.7.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/donutloop/xservice"
   packages = [
@@ -127,6 +133,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "9bf204f077ef77bb7fd7543eb230c4a1d2bc9654d5259dd7ffcbd0b24779f9fd"
+  inputs-digest = "5f1c6ae48cc85f75f54555ab00a6e838b2a19a87330a9ed594a6ab4747e44191"
   solver-name = "gps-cdcl"
   solver-version = 1

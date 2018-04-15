@@ -25,3 +25,7 @@
 [[constraint]]
   branch = "master"
   name = "github.com/globalsign/mgo"
+
+[[constraint]]
+  name = "github.com/donutloop/toolkit"
+  version = "1.7.0"
