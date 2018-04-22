@@ -27,5 +27,14 @@
   name = "github.com/globalsign/mgo"
 
 [[constraint]]
+  name = "github.com/coreos/etcd"
+  version = "3.3.3"
+
+[[constraint]]
+  name = "github.com/go-chi/cors"
+  version = "1.0.0"
+
+[[constraint]]
   name = "github.com/donutloop/toolkit"
   version = "1.7.0"
+

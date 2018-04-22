@@ -1,11 +1,62 @@
 version: '3'
+
+networks:
+  back-tier:
+    driver: bridge
+
 services:
-    mongodb:
-        image: mongo:latest
-        container_name: "mongodb"
-        environment:
-          - MONGO_DATA_DIR=/data/db
-        volumes:
-          - ./data/db:/data/db
-        ports:
-            - 27017:27017
+  etcd:
+    image: quay.io/coreos/etcd
+    command: >-
+      /usr/local/bin/etcd
+      -name etcd0
+      -advertise-client-urls http://0.0.0.0:2379,http://0.0.0.0:4001
+      -listen-client-urls http://0.0.0.0:2379,http://0.0.0.0:4001
+      -initial-advertise-peer-urls http://0.0.0.0:2380
+      -initial-cluster-token etcd-cluster-1
+      -initial-cluster etcd0=http://0.0.0.0:2380
+      -initial-cluster-state new
+    ports:
+      - 2379:2379
+      - 2380:2380
+      - 4001:4001
+    networks:
+      - back-tier
+
+  mongodb:
+    image: mongo:latest
+    container_name: "mongodb"
+    environment:
+      - MONGO_DATA_DIR=/data/db
+    volumes:
+      - ./data/db:/data/db
+    ports:
+      - 27017:27017
+    networks:
+      - back-tier
+
+  stories:
+    image: donutloop/stories:v1.0.0
+    depends_on:
+      - mongodb
+      - etcd
+    command:
+      - '-addr=stories:8080'
+      - '-etcd.addr=http://etcd:2379'
+      - '-db.addr=mongodb:27017'
+    ports:
+      - 8080:8080
+    networks:
+      - back-tier
+
+  frontend:
+    image: donutloop/frontend:v1.0.0
+    depends_on:
+      - etcd
+    command:
+      - '-addr=frontend:8081'
+      - '-etcd.addr=http://etcd:2379'
+    ports:
+      - 8081:8081
+    networks:
+      - back-tier

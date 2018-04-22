@@ -17,12 +17,14 @@
 
 /vendor
 
-/node_modules
+/frontendservice/node_modules
 
-/static/js/bundle.js
+/frontendservice/static/js/bundle.js
 
 /cmd/tmp/*
 
 /cmd/chn/chn
+
+/docker/data
 
 /data

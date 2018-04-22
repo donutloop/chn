@@ -1,0 +1,9 @@
+FROM golang:alpine AS build-env
+COPY ./ /go/src/github.com/donutloop/chn
+WORKDIR /go/src/github.com/donutloop/chn/cmd/frontend
+RUN go build -o server
+
+FROM alpine
+COPY --from=build-env /go/src/github.com/donutloop/chn/cmd/frontend/server /api/
+COPY --from=build-env /go/src/github.com/donutloop/chn/frontendservice/static /static
+ENTRYPOINT ["./api/server"]
