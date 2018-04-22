@@ -1,31 +1,30 @@
 package mediator
 
 import (
-
+	"github.com/donutloop/chn/storiesservice/internal/client"
 	"time"
-	"github.com/donutloop/chn/internal/client"
 
-	"github.com/donutloop/chn/internal/scraper"
-	"sort"
-	"strings"
+	"github.com/donutloop/chn/storiesservice/internal/scraper"
 	"github.com/pkg/errors"
 	url2 "net/url"
+	"sort"
+	"strings"
 )
 
 func NewGithub(c *client.Github, s *scraper.Github, baseURL string, timeoutAfter time.Duration) *Github {
 	return &Github{
 		baseURL:      baseURL,
 		timeoutAfter: timeoutAfter,
-		s: s,
-		c: c,
+		s:            s,
+		c:            c,
 	}
 }
 
 type Github struct {
 	baseURL      string
 	timeoutAfter time.Duration
-	c *client.Github
-	s *scraper.Github
+	c            *client.Github
+	s            *scraper.Github
 }
 
 // todo extract more data

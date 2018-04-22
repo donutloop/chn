@@ -2,7 +2,7 @@ package cache
 
 import (
 	"fmt"
-	"github.com/donutloop/chn/internal/handler"
+	"github.com/donutloop/chn/storiesservice/internal/handler"
 	"github.com/pkg/errors"
 	"github.com/pmylund/go-cache"
 	"time"

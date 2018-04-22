@@ -1,18 +1,18 @@
 package model
 
-import "github.com/donutloop/chn/internal/handler"
+import "github.com/donutloop/chn/storiesservice/internal/handler"
 
 func NewStoryFrom(story *handler.Story) *Story {
 	return &Story{
-		By: story.By,
+		By:          story.By,
 		Descendants: story.Descendants,
-		Kids: story.Kids,
-		Score: story.Score,
-		Type: story.Type,
-		Title: story.Title,
-		Url: story.Url,
-		DomainName: story.DomainName,
-		Langauges: story.Langauges,
+		Kids:        story.Kids,
+		Score:       story.Score,
+		Type:        story.Type,
+		Title:       story.Title,
+		Url:         story.Url,
+		DomainName:  story.DomainName,
+		Langauges:   story.Langauges,
 	}
 }
 

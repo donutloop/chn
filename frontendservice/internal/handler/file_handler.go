@@ -7,11 +7,11 @@ import (
 )
 
 // fileHandler serves a file like the favicon or logo
-func File(file string) func(w http.ResponseWriter, r *http.Request) {
+func File(staticPath string ,file string) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch file {
 		case "index":
-			http.ServeFile(w, r, "../../static/html/index.html")
+			http.ServeFile(w, r, staticPath + "/html/index.html")
 		default:
 			w.WriteHeader(http.StatusNotFound)
 			w.Write([]byte("file not found"))
@@ -25,7 +25,6 @@ func FileServer(r chi.Router, path string, root http.FileSystem) {
 	if strings.ContainsAny(path, "{}*") {
 		panic("FileServer does not permit URL parameters.")
 	}
-
 	fs := http.StripPrefix(path, http.FileServer(root))
 
 	if path != "/" && path[len(path)-1] != '/' {

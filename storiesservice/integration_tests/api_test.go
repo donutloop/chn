@@ -1,12 +1,12 @@
-package chn_integration
+package integration_tests
 
 import (
 	"context"
 	"fmt"
 	"github.com/BurntSushi/toml"
-	"github.com/donutloop/chn/internal/api"
-	"github.com/donutloop/chn/internal/handler"
-	"github.com/donutloop/chn/internal/service"
+	"github.com/donutloop/chn/stories"
+	"github.com/donutloop/chn/storiesservice/internal/api"
+	"github.com/donutloop/chn/storiesservice/internal/handler"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -24,7 +24,7 @@ func TestMain(m *testing.M) {
 	}
 
 	// services ...
-	apiService := service.NewAPIService(config)
+	apiService := stroies.NewAPIService(config)
 	apiService.Init()
 
 	server := httptest.NewServer(apiService.Router)

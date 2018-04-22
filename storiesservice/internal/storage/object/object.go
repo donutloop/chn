@@ -1,6 +1,5 @@
 package object
 
-
 const (
 	// SortNatural use natural order
 	SortNatural Sort = iota

@@ -1,15 +1,15 @@
 package scraper
 
 import (
-	"github.com/PuerkitoBio/goquery"
 	"errors"
+	"github.com/PuerkitoBio/goquery"
 )
 
 func NewGithubScraper() *Github {
 	return &Github{}
 }
 
-type Github struct {}
+type Github struct{}
 
 func (g *Github) ExtractBaseURL(url string) (string, error) {
 	// todo check if is an github url

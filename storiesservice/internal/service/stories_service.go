@@ -2,17 +2,17 @@ package service
 
 import (
 	"context"
-	"github.com/donutloop/chn/internal/cache"
-	"github.com/donutloop/chn/internal/client"
-	"github.com/donutloop/chn/internal/handler"
+	"github.com/donutloop/chn/storiesservice/internal/cache"
+	"github.com/donutloop/chn/storiesservice/internal/client"
+	"github.com/donutloop/chn/storiesservice/internal/handler"
+	"github.com/donutloop/chn/storiesservice/internal/mediator"
+	"github.com/donutloop/chn/storiesservice/internal/model"
+	"github.com/donutloop/chn/storiesservice/internal/storage"
+	"github.com/globalsign/mgo"
 	log "github.com/sirupsen/logrus"
 	"net/url"
 	"strings"
 	"sync"
-	"github.com/donutloop/chn/internal/mediator"
-	"github.com/donutloop/chn/internal/storage"
-	"github.com/donutloop/chn/internal/model"
-	"github.com/globalsign/mgo"
 )
 
 func NewStoriesService(hn *client.HackerNews, storiesCache *cache.StoriesCache, github *mediator.Github, st storage.Interface) *StoriesService {
@@ -20,7 +20,7 @@ func NewStoriesService(hn *client.HackerNews, storiesCache *cache.StoriesCache, 
 		hn:           hn,
 		storiesCache: storiesCache,
 		gh:           github,
-		st: st,
+		st:           st,
 	}
 }
 
@@ -163,7 +163,7 @@ func (service *StoriesService) getStories(codes []int, limit int64) ([]*handler.
 				s.DomainName = h
 				stories = append(stories, s)
 
-				if err := service.st.FindBy("url", s.Url,  new(model.Story)); err == mgo.ErrNotFound {
+				if err := service.st.FindBy("url", s.Url, new(model.Story)); err == mgo.ErrNotFound {
 					log.Debugf("insert new entity into storage (%s)", s.Url)
 					ms := model.NewStoryFrom(s)
 					if err := service.st.Insert(ms); err != nil {

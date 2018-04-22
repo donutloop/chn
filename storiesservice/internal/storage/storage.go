@@ -1,10 +1,10 @@
 package storage
 
 import (
-	"github.com/donutloop/chn/internal/storage/object"
-	"github.com/donutloop/chn/internal/storage/handler/mongo"
+	"github.com/donutloop/chn/storiesservice/internal/storage/handler/mongo"
+	"github.com/donutloop/chn/storiesservice/internal/storage/object"
 	"github.com/pkg/errors"
-	"github.com/donutloop/chn/internal/api"
+	"github.com/donutloop/chn/storiesservice/internal/config"
 )
 
 type handlerName string
@@ -31,7 +31,7 @@ type (
 
 // New creates storage handler from config.Storage and prepare it for use
 // returns error if something went wrong during the preparations
-func New(config *api.Config) (Interface, error) {
+func New(config *config.Config) (Interface, error) {
 	// create handler based on the storage config
 	var h Interface
 	switch handlerName(config.Storage.Handler) {

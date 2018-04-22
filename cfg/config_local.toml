@@ -14,6 +14,5 @@ BaseURL = "https://api.github.com"
 TimeoutAfter = 4096
 Username = ""
 Password = ""
-Address = "localhost:27017"
 Database = "chn"
 Handler  = "mongodb"

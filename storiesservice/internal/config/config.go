@@ -1,9 +1,8 @@
-package api
+package config
 
 import "time"
 
 type Config struct {
-	ENV 		 string
 	TimeoutAfter time.Duration
 	HackerNews   HackerNewsConfig   `toml:"HackerNews"`
 	StoriesCache StoriesCacheConfig `toml:"StoriesCache"`
@@ -26,9 +25,9 @@ type GithubConfig struct {
 
 type StorageConfig struct {
 	TimeoutAfter time.Duration
-	Username string
-	Password string
-	Database string
-	Handler  string
-	Address  string
+	Username     string
+	Password     string
+	Database     string
+	Handler      string
+	Address      string
 }

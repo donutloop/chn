@@ -2,13 +2,13 @@ package mongo
 
 import (
 	"fmt"
-	"sync"
+	"github.com/donutloop/chn/storiesservice/internal/config"
+	"github.com/donutloop/chn/storiesservice/internal/storage/object"
 	"github.com/globalsign/mgo"
-	"github.com/donutloop/chn/internal/storage/object"
 	"github.com/globalsign/mgo/bson"
 	"github.com/satori/go.uuid"
+	"sync"
 	"time"
-	"github.com/donutloop/chn/internal/api"
 )
 
 type handler struct {
@@ -18,7 +18,7 @@ type handler struct {
 }
 
 // NewHandler create new mongo handler
-func NewHandler(config *api.Config) *handler {
+func NewHandler(config *config.Config) *handler {
 	h := &handler{
 		dailInfo: &mgo.DialInfo{
 			PoolLimit: 4096,
@@ -117,7 +117,7 @@ func (h *handler) One(obj object.Interface) error {
 	defer s.Close()
 
 	if err := s.DB(h.database).C(obj.GetNamespace()).Find(bson.D{bson.DocElem{Name: "_id", Value: obj.GetId()}}).One(obj); err != nil {
-		return fmt.Errorf( "`%s::%s::%s`", obj.GetNamespace(), obj.GetId(), err.Error())
+		return fmt.Errorf("`%s::%s::%s`", obj.GetNamespace(), obj.GetId(), err.Error())
 	}
 
 	return nil
@@ -133,7 +133,7 @@ func (h *handler) FindBy(name string, value interface{}, obj object.Interface) e
 	if err := s.DB(h.database).C(obj.GetNamespace()).Find(bson.M{name: value}).One(obj); err == mgo.ErrNotFound {
 		return mgo.ErrNotFound
 	} else if err != nil {
-		return fmt.Errorf( "`%s::%s::%s`", obj.GetNamespace(), obj.GetId(), err.Error())
+		return fmt.Errorf("`%s::%s::%s`", obj.GetNamespace(), obj.GetId(), err.Error())
 	}
 
 	return nil
