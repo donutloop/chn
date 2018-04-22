@@ -33,3 +33,8 @@
 [[constraint]]
   name = "github.com/go-chi/cors"
   version = "1.0.0"
+
+[[constraint]]
+  name = "github.com/donutloop/toolkit"
+  version = "1.7.0"
+

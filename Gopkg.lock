@@ -38,6 +38,12 @@
   version = "v0.2.0"
 
 [[projects]]
+  name = "github.com/donutloop/toolkit"
+  packages = ["retry"]
+  revision = "da402e8bb5494496df89d22d4bf6608b720a79b3"
+  version = "1.7.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/donutloop/xservice"
   packages = [

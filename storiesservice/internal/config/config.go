@@ -8,6 +8,7 @@ type Config struct {
 	StoriesCache StoriesCacheConfig `toml:"StoriesCache"`
 	Github       GithubConfig       `toml:"Github"`
 	Storage      StorageConfig      `toml:"Storage"`
+	StoriesStorage StoriesStorageConfig `toml:"StoriesStorage"`
 }
 
 type HackerNewsConfig struct {
@@ -25,9 +26,15 @@ type GithubConfig struct {
 
 type StorageConfig struct {
 	TimeoutAfter time.Duration
-	Username     string
-	Password     string
-	Database     string
-	Handler      string
-	Address      string
+	Username string
+	Password string
+	Database string
+	Handler  string
+	Address  string
+}
+
+type StoriesStorageConfig struct {
+	InitialInterval float64
+	MaxInterval  float64
+	Tries  			uint
 }

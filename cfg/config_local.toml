@@ -16,3 +16,8 @@ Username = ""
 Password = ""
 Database = "chn"
 Handler  = "mongodb"
+
+[StoriesStorage]
+InitialInterval = 1.0
+MaxInterval = 3.0
+Tries = 3

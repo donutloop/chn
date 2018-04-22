@@ -6,7 +6,6 @@ import (
 	"github.com/donutloop/chn/storiesservice/internal/mediator"
 	"github.com/donutloop/chn/storiesservice/internal/scraper"
 	"github.com/donutloop/chn/storiesservice/internal/service"
-	"github.com/donutloop/chn/storiesservice/internal/storage"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	log "github.com/sirupsen/logrus"
@@ -21,6 +20,7 @@ import (
 	"net/http"
 	"github.com/pkg/errors"
 	"github.com/go-chi/cors"
+	"github.com/donutloop/chn/storiesservice/internal/storage"
 )
 
 func NewAPIService(etcdAddr string, env string, dbAddr string) *APIService {
@@ -74,12 +74,15 @@ func (s *APIService) Init() error {
 
 	storiesCache := cache.NewStoriesCache(s.config.StoriesCache.DefaultExpirationInMinutes, s.config.StoriesCache.CleanupIntervalInMinutes)
 
+
 	st, err := storage.New(s.config)
 	if err != nil {
 		return errors.Wrap(err, "mongo db")
 	} else {
 		log.Infof("storage is connected (%s)", s.config.Storage.Address)
 	}
+
+	storiesStorage := storage.NewStories(st, s.config.StoriesStorage.Tries, s.config.StoriesStorage.InitialInterval, s.config.StoriesStorage.MaxInterval)
 
 	// router and middleware ...
 	r := chi.NewRouter()
@@ -98,7 +101,7 @@ func (s *APIService) Init() error {
 	)
 
 	// services ...
-	storiesService := service.NewStoriesService(hn, storiesCache, githubMediator, st)
+	storiesService := service.NewStoriesService(hn, storiesCache, githubMediator, storiesStorage)
 
 	// routes ...
 	r.Method(http.MethodPost, "/xservice/service.chn.StoryService/Stories", handler.NewStoryServiceServer(storiesService, nil, log.Errorf))
